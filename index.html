@@ -16,7 +16,7 @@
     	var camera, scene, renderer;
       
       var spheres = [],
-      	NUM_SPHERES = 50,
+      	NUM_SPHERES = 7,
       	delay = 10,
       	nextTime = 0,
       	isMouseDown = false,
@@ -92,7 +92,7 @@
 	     	nextTime = loopTime + delay;
 	     
 	     	if (isMouseDown) {
-	     		camera.position.z -= 200;	
+	     		camera.position.z -= 250;	
 	     		console.log("camera: " + camera.position.z);
 	     	}
 	     	
