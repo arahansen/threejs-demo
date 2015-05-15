@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  	<title>Spiraling Down</title>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <script src="js/three.js"></script>
+    <script >
+    	var camera, scene, renderer;
+      
+      var spheres = [],
+      	NUM_SPHERES = 5,
+      	delay = 10,
+      	nextTime = 0,
+      	isMouseDown = false,
+      	initialCameraPosition = 1000,
+      	startTime,
+      	time;
+
+      init();
+      animate();
+ 
+      function init() {
+	 
+	      // renderer
+	      renderer = new THREE.WebGLRenderer();
+	      renderer.setSize(window.innerWidth, window.innerHeight);
+	      document.body.appendChild(renderer.domElement);
+
+	      // set background to white
+	      renderer.setClearColor( 0xffffff, 1);
+	 
+	      // camera
+	      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 20000);
+	      
+	      // scene
+	      scene = new THREE.Scene(); 
+	                
+	      // create spheres
+	      for (var i = 0; i < NUM_SPHERES; i++) {
+	      	spheres[i] = new THREE.Mesh(new THREE.SphereGeometry(10, 10, 10), new THREE.MeshLambertMaterial({
+	      		color: 'red'
+	      	})); 
+	      	scene.add(spheres[i]);
+	      }	      
+	      
+	      // directional lighting
+	      var directionalLight = new THREE.DirectionalLight(0xffffff);
+	      directionalLight.position.set(1, 1, 1).normalize();
+	      scene.add(directionalLight);
+
+	      // initialize camera position
+	      camera.position.z = initialCameraPosition;
+
+	     // set the time animation starts
+	 	  startTime = Date.now();
+
+	     requestAnimationFrame(watcher);
+
+	      // add event listeners
+	     document.addEventListener('mousedown', function(e){mouseDownHandler(e);});
+	     document.addEventListener('mouseup', function(e){mouseUpHandler(e);});
+
+	     function mouseDownHandler(e) {
+	     	e.preventDefault();
+	  
+	     	time = Date.now();
+	     	isMouseDown = true;
+
+
+	     };
+
+	     function mouseUpHandler(e) {
+	     	e.preventDefault();
+	   
+
+	     	time = 0;
+	     	isMouseDown = false;
+	     	console.log("mousedown is: " + isMouseDown);
+	     }
+
+	     function watcher(loopTime) {
+	     	requestAnimationFrame(watcher);
+	     	if (loopTime < nextTime) {return;}
+	     	nextTime = loopTime + delay;
+	     
+	     	if (isMouseDown) {
+	     		camera.position.z -= 200;	
+	     		console.log("camera: " + camera.position.z);
+	     	}
+	     	
+
+	     }
+
+	 	  
+	 }
+
+  function animate() {
+
+    // update
+    time = Date.now();
+    for (var i = 1; i <= NUM_SPHERES; i++) {
+    	spheres[i - 1].position.x = Math.cos(time * 0.01 / i) * i * 20;
+    	spheres[i - 1].position.y = Math.sin(time * 0.01 / i) * i * 20;
+
+    	if (isMouseDown || spheres[i - 1].position.z >= (camera.position.z - initialCameraPosition)) {
+    		spheres[i - 1].position.z -= (spheres.length - i + 1) * 15;
+    		console.log("spheres:" + spheres[1].position.z);
+    	}
+
+    }
+    if (isMouseDown || spheres[spheres.length - 1].position.z >= (camera.position.z - initialCameraPosition)) {
+    	spheres[spheres.length - 1].position.z -= 30;
+
+    }
+    
+    // render
+    renderer.render(scene, camera);
+
+    // request new frame
+    requestAnimationFrame(function(){
+        animate();
+    });
+  }
+
+      // start animation
+      animate();
+    </script>
+  </body>
+</html> 
